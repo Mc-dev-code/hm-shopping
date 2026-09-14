@@ -32,6 +32,7 @@ export default {
     }
   },
   methods: {
+    // 搜索框跳转
     goSearch (searchKey) {
       // 更新搜索历史, 如果已经有历史了,就放在开头,删掉重新放
       if (!searchKey) {

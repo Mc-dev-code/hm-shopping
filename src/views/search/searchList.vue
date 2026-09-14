@@ -45,21 +45,25 @@ export default {
     async getProList () {
       // 请求参数
       const obj = {
-        categoryId: 0,
+        categoryId: this.categoryId,
         goodsName: this.querySearch,
         page: this.page
       }
-      console.log(obj.goodsName)
-      console.log(obj.page)
+      // console.log(obj.goodsName)
+      // console.log(obj.page)
       const res = await getProListApi(obj)
       this.proList = res.data.data.list.data
-      console.log(this.proList)
+      // console.log(this.proList)
     }
   },
   computed: {
     // 获取传过来的参数
     querySearch () {
       return this.$route.query.search
+    },
+    // 搜索传递的参数
+    categoryId () {
+      return this.$route.query.categoryId
     }
   },
   created () {
