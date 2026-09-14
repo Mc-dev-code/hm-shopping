@@ -55,7 +55,7 @@ export default {
   },
   data () {
     return {
-      pageData: null, // 从后台拿回来的主要数据
+      pageData: null, // 从后台拿回来的主要数据,可以删掉
       bannerList: [], // 轮播
       navList: [], // 导航
       proList: [] // 商品
@@ -71,7 +71,7 @@ export default {
       this.proList = this.pageData.items[6].data
       // console.log(this.bannerList)
       // console.log(this.navList)
-      console.log(this.proList)
+      // console.log(this.proList)
     }
   },
   created () {

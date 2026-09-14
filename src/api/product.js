@@ -1,4 +1,4 @@
-// 存放所有搜索相关的接口请求
+// 存放所有搜索商品相关的接口请求
 import request from '@/utils/request'
 const getProListApi = (obj) => {
   const res = request({
