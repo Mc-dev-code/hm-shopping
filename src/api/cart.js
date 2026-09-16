@@ -16,6 +16,18 @@ const addCartApi = (params) => {
   })
   return res
 }
+// 购物车商品列表
+const getShoppingCartListApi = (params) => {
+  const res = request({
+    url: 'index.php?s=/api/cart/list',
+    method: 'get',
+    headers: {
+      'Access-Token': params.token
+    }
+  })
+  return res
+}
 export {
-  addCartApi
+  addCartApi,
+  getShoppingCartListApi
 }
