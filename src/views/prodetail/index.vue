@@ -70,7 +70,9 @@
         <van-icon name="wap-home-o" />
         <span>首页</span>
       </div>
+      <!-- 角标 -->
       <div class="icon-cart">
+        <span v-if="cartTotal > 0" class="num">{{ cartTotal }}</span>
         <van-icon name="shopping-cart-o" />
         <span>购物车</span>
       </div>
@@ -112,6 +114,7 @@
 
 <script>
 import { getGoodsDetailApi, getGoodsCommentApi } from '@/api/product'
+import { addCartApi } from '@/api/cart'
 import defaultImg from '@/assets/default-avatar.png'
 import CountBox from '@/components/CountBox.vue'
 export default {
@@ -129,7 +132,8 @@ export default {
       defaultImg, // 默认头像
       showPannel: false, // 控制弹层的显示
       mode: '', // 弹层的标题
-      count: 1 // 要添加到购物车商品的数量
+      count: 1, // 要添加到购物车商品的数量
+      cartTotal: 0 // 购物车角标
     }
   },
   computed: {
@@ -168,17 +172,23 @@ export default {
       this.mode = '立即购买'
       this.showPannel = true
     },
-    // 判断用户是否登录
-    addCart () {
+    // 加入购物车,判断用户是否登录了
+    async addCart () {
       if (this.$store.state.user.token) {
-        // console.log('token存在')
         // 登录过的逻辑
-        // console.log(this.$store.state.user.token)
-        // this.$router.push('')
+        const params = {
+          token: this.$store.state.user.token,
+          goodsId: this.goodsId,
+          goodsNum: this.count,
+          goodsSkuId: '0'
+        }
+        // console.log(params)
+        const res = await addCartApi(params)
+        this.cartTotal = res.data.data.cartTotal
+        this.$toast('加入购物车成功')
+        this.showPannel = false
       } else {
-        // console.log('token不存在')
         // 未登录的逻辑
-        // console.log(this.$store.state.user.token)
         this.$dialog.alert({
           title: '温馨提示',
           message: '您还未登录'
@@ -329,6 +339,8 @@ export default {
     align-items: center;
     z-index: 999;
     .icon-home, .icon-cart {
+      position: relative;
+      padding: 0 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -336,6 +348,18 @@ export default {
       font-size: 14px;
       .van-icon {
         font-size: 24px;
+      }
+      .num {
+        z-index: 999;
+        position: absolute;
+        top: -2px;
+        right: 0;
+        min-width: 16px;
+        padding: 0 4px;
+        color: #fff;
+        text-align: center;
+        background-color: #ee0a24;
+        border-radius: 50%;
       }
     }
     .btn-add,
