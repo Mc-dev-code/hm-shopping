@@ -74,9 +74,39 @@
         <van-icon name="shopping-cart-o" />
         <span>购物车</span>
       </div>
-      <div class="btn-add">加入购物车</div>
-      <div class="btn-buy">立刻购买</div>
+      <div class="btn-add" @click="addFn">加入购物车</div>
+      <div class="btn-buy" @click="buyFn">立刻购买</div>
     </div>
+    <!-- 加入购物车的弹层 -->
+    <van-action-sheet v-model="showPannel" :title="mode">
+  <div class="product">
+    <div class="product-title">
+      <div class="left">
+        <img :src="detail.goods_image" alt="">
+      </div>
+      <div class="right">
+        <div class="price">
+          <span>¥</span>
+          <span class="nowprice">{{ detail.goods_price_min }}</span>
+        </div>
+        <div class="count">
+          <span>库存</span>
+          <span>{{ detail.stock_total }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="num-box">
+      <span>数量</span>
+      <!-- 使用插槽 -->
+      数字框占位
+    </div>
+    <div class="showbtn" v-if="detail.stock_total > 0">
+      <div class="btn" v-if="true">加入购物车</div>
+      <div class="btn now" v-else>立刻购买</div>
+    </div>
+    <div class="btn-none" v-else>该商品已抢完</div>
+  </div>
+</van-action-sheet>
   </div>
 </template>
 
@@ -87,12 +117,14 @@ export default {
   name: 'ProDetail',
   data () {
     return {
-      images: [],
+      images: [], // 轮播图
       current: 0,
       detail: {}, // 商品信息
       comment: [], // 商品评论
       total: 0, // 一共多少条评论
-      defaultImg // 默认头像
+      defaultImg, // 默认头像
+      showPannel: false, // 控制弹层的显示
+      mode: '' // 弹层的标题
     }
   },
   computed: {
@@ -110,7 +142,7 @@ export default {
       // console.log(res.data.data.detail)
       this.detail = res.data.data.detail
       this.images = res.data.data.detail.goods_images
-      // console.log(this.detail)
+      console.log(this.detail)
       // console.log(this.images)
     },
     async getGoodsComment () {
@@ -122,6 +154,14 @@ export default {
       // console.log(res.data)
       this.comment = res.data.data.list
       this.total = res.data.data.total
+    },
+    addFn () {
+      this.mode = '加入购物车'
+      this.showPannel = true
+    },
+    buyFn () {
+      this.mode = '立即购买'
+      this.showPannel = true
     }
   },
   created () {
@@ -132,6 +172,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.content {
+  padding: 1px 1px 1px;
+}
 .prodetail {
   padding-top: 46px;
   ::v-deep .van-icon-arrow-left {
@@ -276,5 +319,52 @@ export default {
 
 .tips {
   padding: 10px;
+}
+.product {
+  .product-title {
+    display: flex;
+    .left {
+      img {
+        width: 90px;
+        height: 90px;
+      }
+      margin: 10px;
+    }
+    .right {
+      flex: 1;
+      padding: 10px;
+      .price {
+        font-size: 14px;
+        color: #fe560a;
+        .nowprice {
+          font-size: 24px;
+          margin: 0 5px;
+        }
+      }
+    }
+  }
+
+  .num-box {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+  }
+
+  .btn, .btn-none {
+    height: 40px;
+    line-height: 40px;
+    margin: 20px;
+    border-radius: 20px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 148, 2);
+  }
+  .btn.now {
+    background-color: #fe5630;
+  }
+  .btn-none {
+    background-color: #cccccc;
+  }
 }
 </style>
