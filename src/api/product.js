@@ -1,14 +1,14 @@
 // 存放所有搜索商品相关的接口请求
 import request from '@/utils/request'
 // 商品列表
-const getProListApi = (params) => {
+const getProListApi = (queryObj) => {
   const res = request({
     url: 'index.php?s=/api/goods/list',
     method: 'get',
     params: {
-      categoryId: params.categoryId,
-      goodsName: params.goodsName,
-      page: params.page
+      categoryId: queryObj.categoryId,
+      goodsName: queryObj.goodsName,
+      page: queryObj.page
     }
   })
   return res
@@ -25,13 +25,13 @@ const getGoodsDetailApi = (goodsId) => {
   return res
 }
 // 商品评论
-const getGoodsCommentApi = (params) => {
+const getGoodsCommentApi = (queryObj) => {
   const res = request({
     url: 'index.php?s=/api/comment/listRows',
     methods: 'get',
     params: {
-      goodsId: params.goodsId,
-      limit: params.limit
+      goodsId: queryObj.goodsId,
+      limit: queryObj.limit
     }
   })
   return res

@@ -1,4 +1,4 @@
-
+import { cartListUpdateApi } from '@/api/cart'
 const state = () => {
   return {
     cartList: []
@@ -22,7 +22,19 @@ const mutations = {
     })
   }
 }
-const actions = {}
+const actions = {
+  // 向后台更新购物车数据并修改当前页面的数据
+  async cartListUpdate (context, queryObj) {
+    // console.log(queryObj)
+    // 修改数据
+    const goods = context.state.cartList.find((item) => {
+      return item.goods_id === queryObj.goodsId
+    })
+    goods.goods_num = queryObj.goodsNum
+    // 提交后台
+    await cartListUpdateApi(queryObj)
+  }
+}
 const getters = {
   // 购物车里的所有商品数量
   cartTotal (state) {

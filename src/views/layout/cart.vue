@@ -21,7 +21,9 @@
           <span class="tit text-ellipsis-2">{{ item.goods.goods_name }}</span>
           <span class="bottom">
             <div class="price">¥ <span>{{ item.goods.goods_price_min }}</span></div>
-            <CountBox :value="item.goods_num"></CountBox>
+            <!-- 加减数量 -->
+             <!-- 即希望保留原本的input的值,也希望能传递自己的参数,箭头函数包装一层 -->
+            <CountBox @input="(value)=>changeCount(value, item.goods_id, item.goods_sku_id)" :value="item.goods_num"></CountBox>
           </span>
         </div>
       </div>
@@ -61,10 +63,10 @@ export default {
   methods: {
     // 获取购物车的数据
     async getShoppingCartList () {
-      const params = {
+      const queryObj = {
         token: this.$store.state.user.token
       }
-      const res = await getShoppingCartListApi(params)
+      const res = await getShoppingCartListApi(queryObj)
       // console.log(res.data)
       const cartList = res.data.data.list
       cartList.forEach(item => {
@@ -78,6 +80,18 @@ export default {
     },
     toggleAllCheck () {
       this.$store.commit('cart/toggleAllCheck', !this.isAllChecked)
+    },
+    changeCount (goodsNum, goodsId, goodsSkuId) {
+      // input事件可以直接拿
+      const queryObj = {
+        token: this.$store.state.user.token,
+        goodsId: goodsId,
+        goodsNum: goodsNum,
+        goodsSkuId: goodsSkuId
+      }
+      // console.log(queryObj)
+      this.$store.dispatch('cart/cartListUpdate', queryObj)
+      // console.log('向后台发送请求')
     }
   },
   computed: {
