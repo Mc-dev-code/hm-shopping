@@ -44,14 +44,14 @@ export default {
   methods: {
     async getProList () {
       // 请求参数
-      const obj = {
+      const params = {
         categoryId: this.categoryId,
         goodsName: this.querySearch,
         page: this.page
       }
       // console.log(obj.goodsName)
       // console.log(obj.page)
-      const res = await getProListApi(obj)
+      const res = await getProListApi(params)
       this.proList = res.data.data.list.data
       // console.log(this.proList)
     }
