@@ -98,10 +98,10 @@
     <div class="num-box">
       <span>数量</span>
       <!-- 使用插槽 -->
-      数字框占位
+      <CountBox v-model="count"></CountBox>
     </div>
     <div class="showbtn" v-if="detail.stock_total > 0">
-      <div class="btn" v-if="true">加入购物车</div>
+      <div class="btn" v-if="true" @click="addCart">加入购物车</div>
       <div class="btn now" v-else>立刻购买</div>
     </div>
     <div class="btn-none" v-else>该商品已抢完</div>
@@ -113,8 +113,12 @@
 <script>
 import { getGoodsDetailApi, getGoodsCommentApi } from '@/api/product'
 import defaultImg from '@/assets/default-avatar.png'
+import CountBox from '@/components/CountBox.vue'
 export default {
   name: 'ProDetail',
+  components: {
+    CountBox
+  },
   data () {
     return {
       images: [], // 轮播图
@@ -124,7 +128,8 @@ export default {
       total: 0, // 一共多少条评论
       defaultImg, // 默认头像
       showPannel: false, // 控制弹层的显示
-      mode: '' // 弹层的标题
+      mode: '', // 弹层的标题
+      count: 1 // 要添加到购物车商品的数量
     }
   },
   computed: {
@@ -142,7 +147,7 @@ export default {
       // console.log(res.data.data.detail)
       this.detail = res.data.data.detail
       this.images = res.data.data.detail.goods_images
-      console.log(this.detail)
+      // console.log(this.detail)
       // console.log(this.images)
     },
     async getGoodsComment () {
@@ -162,6 +167,38 @@ export default {
     buyFn () {
       this.mode = '立即购买'
       this.showPannel = true
+    },
+    // 判断用户是否登录
+    addCart () {
+      if (this.$store.state.user.token) {
+        // console.log('token存在')
+        // 登录过的逻辑
+        // console.log(this.$store.state.user.token)
+        // this.$router.push('')
+      } else {
+        // console.log('token不存在')
+        // 未登录的逻辑
+        // console.log(this.$store.state.user.token)
+        this.$dialog.alert({
+          title: '温馨提示',
+          message: '您还未登录'
+        }).then(() => {
+          // 让登录后还回到购物车这里
+          this.$router.push({
+            path: '/login',
+            query: {
+              backUrl: this.$route.fullPath
+            }
+          })
+        })
+      }
+    }
+  },
+  watch: {
+    goodsId () {
+      this.getGoodsDetail()
+      this.getGoodsComment()
+      this.showPannel = false
     }
   },
   created () {
@@ -290,6 +327,7 @@ export default {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    z-index: 999;
     .icon-home, .icon-cart {
       display: flex;
       flex-direction: column;

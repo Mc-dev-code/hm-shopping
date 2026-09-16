@@ -1,10 +1,8 @@
 import { setInfo, getInfo } from '@/utils/storage'
 
 const state = () => {
-  return {
-    user: getInfo()
-
-  }
+  const user = getInfo()
+  return user
 }
 const mutations = {
   setUser (state, user) {
