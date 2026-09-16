@@ -54,7 +54,8 @@ const routes = [
   },
   {
     path: '/prodetail',
-    component: ProDetail
+    component: ProDetail,
+    meta: { hideTabbar: true } // 标记要隐藏底部栏
   }
 ]
 
