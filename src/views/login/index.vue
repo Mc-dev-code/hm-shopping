@@ -138,9 +138,12 @@ export default {
       // console.log(res.data)
       if (res.data.status === 200) {
         this.$toast('登录成功')
-        this.$router.push('/')
         const user = { userId: res.data.data.userId, token: res.data.data.token }
-        this.setUser(user)
+        // this.setUser(user)
+        this.$store.commit('user/setUser', user)
+        // 判断,看地址栏有无回跳地址,有点话说明是从其他地方来的
+        const url = this.$route.query.backUrl || '/'
+        this.$router.replace(url)
       } else {
         this.$toast('登录失败')
         this.$router.push('/login')

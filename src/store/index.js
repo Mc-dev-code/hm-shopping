@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from './modules/user'
+import cart from './modules/cart'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -10,7 +11,7 @@ export default new Vuex.Store({
   getters: {
     // 封装一个全局的获取token的函数
     getToken (state) {
-      return state.user.user.token
+      return state.user.token
     }
   },
   mutations: {
@@ -18,6 +19,7 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    user
+    user,
+    cart
   }
 })

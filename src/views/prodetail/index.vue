@@ -66,33 +66,74 @@
 
     <!-- 底部 -->
     <div class="footer">
-      <div class="icon-home">
+      <div class="icon-home" @click="$router.push('/')">
         <van-icon name="wap-home-o" />
         <span>首页</span>
       </div>
-      <div class="icon-cart">
+      <!-- 角标 -->
+      <div class="icon-cart" @click="$router.push('/cart')">
+        <span v-if="cartTotal > 0" class="num">{{ cartTotal }}</span>
         <van-icon name="shopping-cart-o" />
         <span>购物车</span>
       </div>
-      <div class="btn-add">加入购物车</div>
-      <div class="btn-buy">立刻购买</div>
+      <div class="btn-add" @click="addFn">加入购物车</div>
+      <div class="btn-buy" @click="buyFn">立刻购买</div>
     </div>
+    <!-- 加入购物车的弹层 -->
+    <van-action-sheet v-model="showPannel" :title="mode">
+  <div class="product">
+    <div class="product-title">
+      <div class="left">
+        <img :src="detail.goods_image" alt="">
+      </div>
+      <div class="right">
+        <div class="price">
+          <span>¥</span>
+          <span class="nowprice">{{ detail.goods_price_min }}</span>
+        </div>
+        <div class="count">
+          <span>库存</span>
+          <span>{{ detail.stock_total }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="num-box">
+      <span>数量</span>
+      <!-- 使用插槽 -->
+      <CountBox v-model="count"></CountBox>
+    </div>
+    <div class="showbtn" v-if="detail.stock_total > 0">
+      <div class="btn" v-if="true" @click="addCart">加入购物车</div>
+      <div class="btn now" v-else>立刻购买</div>
+    </div>
+    <div class="btn-none" v-else>该商品已抢完</div>
+  </div>
+</van-action-sheet>
   </div>
 </template>
 
 <script>
 import { getGoodsDetailApi, getGoodsCommentApi } from '@/api/product'
+import { addCartApi } from '@/api/cart'
 import defaultImg from '@/assets/default-avatar.png'
+import CountBox from '@/components/CountBox.vue'
 export default {
   name: 'ProDetail',
+  components: {
+    CountBox
+  },
   data () {
     return {
-      images: [],
+      images: [], // 轮播图
       current: 0,
       detail: {}, // 商品信息
       comment: [], // 商品评论
       total: 0, // 一共多少条评论
-      defaultImg // 默认头像
+      defaultImg, // 默认头像
+      showPannel: false, // 控制弹层的显示
+      mode: '', // 弹层的标题
+      count: 1, // 要添加到购物车商品的数量
+      cartTotal: 0 // 购物车角标
     }
   },
   computed: {
@@ -122,6 +163,52 @@ export default {
       // console.log(res.data)
       this.comment = res.data.data.list
       this.total = res.data.data.total
+    },
+    addFn () {
+      this.mode = '加入购物车'
+      this.showPannel = true
+    },
+    buyFn () {
+      this.mode = '立即购买'
+      this.showPannel = true
+    },
+    // 加入购物车,判断用户是否登录了
+    async addCart () {
+      if (this.$store.state.user.token) {
+        // 登录过的逻辑
+        const params = {
+          token: this.$store.state.user.token,
+          goodsId: this.goodsId,
+          goodsNum: this.count,
+          goodsSkuId: '0'
+        }
+        // console.log(params)
+        const res = await addCartApi(params)
+        this.cartTotal = res.data.data.cartTotal
+        this.$toast('加入购物车成功')
+        this.showPannel = false
+      } else {
+        // 未登录的逻辑
+        this.$dialog.alert({
+          title: '温馨提示',
+          message: '您还未登录'
+        }).then(() => {
+          // 让登录后还回到购物车这里
+          this.$router.push({
+            path: '/login',
+            query: {
+              backUrl: this.$route.fullPath
+            }
+          })
+        })
+      }
+    }
+  },
+  watch: {
+    goodsId () {
+      this.getGoodsDetail()
+      this.getGoodsComment()
+      this.showPannel = false
     }
   },
   created () {
@@ -132,6 +219,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.content {
+  padding: 1px 1px 1px;
+}
 .prodetail {
   padding-top: 46px;
   ::v-deep .van-icon-arrow-left {
@@ -247,7 +337,10 @@ export default {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    z-index: 999;
     .icon-home, .icon-cart {
+      position: relative;
+      padding: 0 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -255,6 +348,18 @@ export default {
       font-size: 14px;
       .van-icon {
         font-size: 24px;
+      }
+      .num {
+        z-index: 999;
+        position: absolute;
+        top: -2px;
+        right: 0;
+        min-width: 16px;
+        padding: 0 4px;
+        color: #fff;
+        text-align: center;
+        background-color: #ee0a24;
+        border-radius: 50%;
       }
     }
     .btn-add,
@@ -276,5 +381,52 @@ export default {
 
 .tips {
   padding: 10px;
+}
+.product {
+  .product-title {
+    display: flex;
+    .left {
+      img {
+        width: 90px;
+        height: 90px;
+      }
+      margin: 10px;
+    }
+    .right {
+      flex: 1;
+      padding: 10px;
+      .price {
+        font-size: 14px;
+        color: #fe560a;
+        .nowprice {
+          font-size: 24px;
+          margin: 0 5px;
+        }
+      }
+    }
+  }
+
+  .num-box {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+  }
+
+  .btn, .btn-none {
+    height: 40px;
+    line-height: 40px;
+    margin: 20px;
+    border-radius: 20px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 148, 2);
+  }
+  .btn.now {
+    background-color: #fe5630;
+  }
+  .btn-none {
+    background-color: #cccccc;
+  }
 }
 </style>

@@ -1,5 +1,6 @@
 // 引入axios
 import axios from 'axios'
+// import store from '@/store'
 import { Toast } from 'vant'
 // 创建一个axios实例,不希望污染原始的axios
 const instance = axios.create({
@@ -19,6 +20,12 @@ instance.interceptors.request.use(
       loadingType: 'spinner',
       duration: 0
     })
+
+    // 只有有token,就在请求时携带
+    // const token = store.state.user.token
+    // if (token) {
+    //   config.headers['Access-Token'] = token
+    // }
     return config
   },
   function (error) {
